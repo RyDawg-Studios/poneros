@@ -3,20 +3,26 @@
 
 #include <windows.h>
 #include <iostream>
+#include <vector>
 
 // Project includes
 #include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
+
+// Engine includes
 #include "util/string_utils.cpp"
+#include "util/file_utils.cpp"
+#include "game/game_state.cpp"
 #include "render/render.cpp"
 
-
+// Move this to input.
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-        printf("Esc!");
-}
+};
 
+GameState* game_state = new(GameState);
 
 int main () {
     std::cout << "Poneros\n";
@@ -42,7 +48,7 @@ int main () {
     
     glfwSetKeyCallback(window, key_callback);
     
-    create_shader_programs();
+    init_render();
     
     while (!glfwWindowShouldClose(window)) {
         

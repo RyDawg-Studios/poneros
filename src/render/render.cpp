@@ -1,43 +1,42 @@
 #pragma once
 
-#include <fstream>
-#include <iostream>
-#include <sstream> //std::stringstream
+#include "render.h"
 
-#include "glad/glad.h" 
-#include "./../glad.c"
+void init_render () {
+    create_renderer();    
+    create_shader_program();
+};
 
-const GLchar* read_from_file(const GLchar* pathToFile)
-{
-    std::string content;
-    std::ifstream fileStream(pathToFile, std::ios::in);
-
-    if(!fileStream.is_open()) {
-        std::cerr << "Could not read file " << pathToFile << ". File does not exist." << std::endl;
-        return "";
-    }
-
-    std::string line = "";
-    while(!fileStream.eof()) {
-        std::getline(fileStream, line);
-        content.append(line + "\n");
-    }
-
-    fileStream.close();
-    
-    return content.c_str();
+void create_renderer() {
+    game_state->render_handle = new(RenderHandle);
 }
 
-void create_shader_programs () {
-    const GLchar* vertex_shader_data;
-    
-    vertex_shader_data = read_from_file("C:/Users/RyDaw/Documents/poneros/src/shaders/shader.vert");
-    
-    std::cout << vertex_shader_data << std::endl;
-    
+void create_shader_program () {
+    const GLchar* vertex_shader_data = 
+        read_from_file("C:/Users/RyDaw/Documents/poneros/src/shaders/shader.vert");
+        
+    const GLchar* fragment_shader_data = 
+        read_from_file("C:/Users/RyDaw/Documents/poneros/src/shaders/shader.frag");
+        
     const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_data, NULL);
     glCompileShader(vertex_shader);
+    
+    const GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_data, NULL);
+    glCompileShader(fragment_shader);
+    
+    game_state->render_handle->shader_program = glCreateProgram();
+    unsigned int* shader_program = &game_state->render_handle->shader_program; 
+    
+    glAttachShader(*shader_program, vertex_shader);
+    glAttachShader(*shader_program, fragment_shader);
+    glLinkProgram(*shader_program);
+    glUseProgram(*shader_program);
+    
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    
 }
 
 void render () {
