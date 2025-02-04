@@ -12,8 +12,8 @@
 // Engine includes
 #include "util/string_utils.cpp"
 #include "util/file_utils.cpp"
-#include "game/game_state.cpp"
-#include "render/render.cpp"
+#include "game_state.h"
+#include "render.h"
 
 // Move this to input.
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

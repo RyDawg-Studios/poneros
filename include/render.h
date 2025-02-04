@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glad/glad.h" 
-#include "./../glad.c"
+#include "glad.c"
 
 struct GameState;
 extern GameState* game_state;
