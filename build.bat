@@ -1,7 +1,4 @@
-@echo ON
-
-echo includes :
-echo %INCLUDE%
+@echo OFF
 
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 

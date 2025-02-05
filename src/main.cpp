@@ -10,8 +10,8 @@
 #include "glm/glm.hpp"
 
 // Engine includes
-#include "util/string_utils.cpp"
-#include "util/file_utils.cpp"
+#include "string_utils.h"
+#include "file_utils.h"
 #include "game_state.h"
 #include "render.h"
 
