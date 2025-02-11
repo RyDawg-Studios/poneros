@@ -1,25 +1,25 @@
 #pragma once
 
 #include "glad/glad.h" 
-#include "glad.c"
+#include "vector"
+#include "game_state.h"
 
-struct GameState;
+#include <glm/ext/vector_float3.hpp>
+
 extern GameState* game_state;
-
-using namespace glm;
 
 struct RenderHandle {
     unsigned int shader_program;
 };
 
 struct Vertex {
-    vec3 pos;
-    vec3 color; 
+    glm::vec3 pos;
+    glm::vec3 color; 
 };
 
 struct Mesh {
     std::vector<Vertex>* vertex_data;
-    std::vector<int32>*  element_data;
+    std::vector<uint32_t>*  element_data;
 };
 
 

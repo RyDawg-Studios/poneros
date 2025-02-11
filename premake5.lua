@@ -3,11 +3,17 @@ workspace "Poneros"
    configurations { "Debug", "Release" }
 
 project "Poneros"
+   architecture "x64"
    kind "ConsoleApp"
    language "C++"
    targetdir "build/%{cfg.buildcfg}"
+   
+   libdirs { "lib" }
+   includedirs{"include/**", "include"} 
 
    files { "**.h", "**.cpp", "**.c" }
+   links {"glfw3", "user32", "vcruntime", "shell32", "gdi32"}
+   
 
    filter "configurations:Debug"
       defines { "DEBUG" }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "render.h"
+struct RenderHandle;
 
 struct GameState {
-    struct 
-    RenderHandle* render_handle = nullptr;
+    struct RenderHandle* render_handle = nullptr;
 };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "render.h"
+#include "file_utils.h"
+
 
 void init_render () {
     create_renderer();    
