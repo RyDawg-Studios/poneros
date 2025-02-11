@@ -6,6 +6,7 @@ project "Poneros"
    architecture "x64"
    kind "ConsoleApp"
    language "C++"
+   cppdialect "C++latest"
    targetdir "build/%{cfg.buildcfg}"
    
    libdirs { "lib" }
