@@ -9,7 +9,6 @@
 
 extern GameState* game_state;
 
-
 struct Vertex {
     glm::vec3 position  = {.0f, .0f, .0f};
     glm::vec3 normal    = {.0f, .0f, .0f};
@@ -34,11 +33,17 @@ struct MeshInstance {
 struct Model {
     Mesh* mesh_data;
     std::vector<MeshInstance> instances; 
+    uint32_t* VAO = nullptr;
+    uint32_t VBO = 0;
+    uint32_t EBO = 0;
 };
 
 struct RenderHandle {
     unsigned int shader_program;
-    Model models[];
+    // At compile time, load all mesh data into here.
+    std::vector<Model> models;
+    
+    unsigned int default_vao = 0;
 };
 
 // Render Pipeline
@@ -46,7 +51,9 @@ void init_render ();
 void create_window ();
 void create_renderer ();
 void create_shader_program ();
+void create_vertex_attributes () ;
 void render ();
 
 // Model Utility
-void create_model (Mesh* mesh); 
+Model create_model (Mesh* mesh, uint32_t* VAO); 
+int32_t add_model_instance (Model& model, MeshInstance mesh_instance);

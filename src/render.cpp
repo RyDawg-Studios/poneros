@@ -2,6 +2,7 @@
 
 #include "render.h"
 #include "file_utils.h"
+#include <cstdio>
 
 Vertex TEST_VERTS[] = {
     {{-.5, -.5, .0}},
@@ -14,19 +15,15 @@ Mesh TEST_MESH = {
     .vertex_count   = 3
 };
 
-Model TEST_MODEL = {
-    .mesh_data = &TEST_MESH,
-    .instances = {
-        {}
-    }
-};
-
-
 void init_render () {
-    create_renderer();    
+    create_renderer();
     create_window();
     create_shader_program();
+    create_vertex_attributes();
     
+    uint32_t* default_vao = &game_state->render_handle->default_vao;
+    Model model = create_model(&TEST_MESH, default_vao);
+    add_model_instance(model, {});
 };
 
 void create_window () {
@@ -81,12 +78,46 @@ void create_shader_program () {
     glDeleteShader(fragment_shader);
 }
 
-void render () {
-    glfwSwapBuffers(game_state->window);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+void create_vertex_attributes () {
+    glGenVertexArrays(1, &(game_state->render_handle->default_vao));
+    glBindVertexArray(game_state->render_handle->default_vao);
 }
 
-void create_model (Mesh* mesh) {
+void render () {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    for (Model &model : game_state->render_handle->models) {
+        
+        glBindBuffer(GL_ARRAY_BUFFER, model.VBO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+        
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+    glfwSwapBuffers(game_state->window);
+}
+
+Model create_model (Mesh* mesh, uint32_t* VAO) {
+    Model model = {};
+    model.mesh_data = mesh;
+    model.VAO = VAO;
+    
+    glGenBuffers(1, &model.VBO);
+    glGenBuffers(1, &model.EBO);
+
+    int vbo_size = model.mesh_data->vertex_count * sizeof(Vertex);
+    glNamedBufferData(model.VBO, vbo_size, model.mesh_data->vertex_data, GL_STATIC_DRAW);
+    
+    game_state->render_handle->models.push_back(model);
+        
+    return model; 
+}
+
+int32_t add_model_instance (Model& model, MeshInstance mesh_instance) {
+    model.instances.push_back(mesh_instance);
+    return model.instances.size();
 }

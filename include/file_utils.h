@@ -22,5 +22,8 @@ const char* read_from_file(const char* pathToFile)
 
     fileStream.close();
     
-    return content.c_str();
+    char* buffer = (char*)malloc(content.length() + 1);
+    memcpy(buffer, content.c_str(), content.length() + 1);
+        
+    return buffer;
 }
