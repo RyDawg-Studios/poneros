@@ -22,21 +22,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 GameState* game_state = new(GameState);
 
-int main () {    
+int main () {
     init_render();
-    
+
     glfwSwapInterval(1);
     glfwSetKeyCallback(game_state->window, key_callback);
-    
-    
+
+
     while (!glfwWindowShouldClose(game_state->window)) {
-        
-        glfwPollEvents();        
+	glfwPollEvents();
         render();
-    } 
-    
+    }
+
     glfwDestroyWindow(game_state->window);
     glfwTerminate();
-    
+
     return 0;
-}   
+}
