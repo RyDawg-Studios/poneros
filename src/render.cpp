@@ -27,7 +27,7 @@ void init_render () {
 };
 
 void create_window () {
-    if (!glfwInit()) {
+   if (!glfwInit()) {
         printf("GLFW Init failed\n");
     }
 

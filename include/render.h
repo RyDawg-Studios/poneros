@@ -16,6 +16,19 @@ struct Vertex {
     glm::vec2 tex_coord = {.0f, .0f};
 };
 
+struct Scene {
+    Mesh* mesh_data = nullptr;
+    int32_t num_meshes = 0;
+
+	std::vector<MeshNode> nodes;
+
+}
+
+struct MeshNode {
+    std::vector<MeshNode>	children;	// Tree
+    std::vector<int>		meshes;  	// Index to the root nodes meshes.				
+}
+
 struct Mesh {
     Vertex* vertex_data  = nullptr;
     int32_t vertex_count = 0;
@@ -24,7 +37,7 @@ struct Mesh {
     int32_t     element_count = 0;
 };
 
-struct MeshInstance {
+struct MeshInstance { 	
     glm::vec3 position = {0, 0, 0};
     // This should eventually hold a pointer to the
     // Entity that will be rendered here.
