@@ -22,8 +22,14 @@ void init_render () {
     create_vertex_attributes();
     
     uint32_t* default_vao = &game_state->render_handle->default_vao;
-    Model model = create_model(&TEST_MESH, default_vao);
-    add_model_instance(model, {});
+    Model* test_model = create_model(default_vao);
+    
+    setup_mesh(test_model, &TEST_MESH);
+
+    test_model->instances.push_back({});
+    MeshNode test_node = {};
+    test_node.indices.push_back(0);
+    test_model->nodes.push_back(test_node);
 };
 
 void create_window () {
@@ -92,35 +98,59 @@ void render () {
     glEnableVertexAttribArray(2);
 
     for (Model &model : game_state->render_handle->models) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, model.VBO);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE,  sizeof(Vertex), (void*)0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));
 
+        for (MeshNode &node : model.nodes) {
+            for (int &id : node.indices) {
+                glBindBuffer(GL_ARRAY_BUFFER, model.meshes[id].VBO);
+                            
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+            }
+        }
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     glfwSwapBuffers(game_state->window);
 }
 
-Model create_model (Mesh* mesh, uint32_t* VAO) {
+int get_vert_data_size (Mesh* mesh) {
+    return mesh->vertex_count * sizeof(Vertex);
+}
+
+
+Model* create_model (uint32_t* VAO) {
     Model model = {};
-    model.mesh_data = mesh;
-    model.VAO = VAO;
-
-    glGenBuffers(1, &model.VBO);
-    glGenBuffers(1, &model.EBO);
-
-    int vbo_size = model.mesh_data->vertex_count * sizeof(Vertex);
-    glNamedBufferData(model.VBO, vbo_size, model.mesh_data->vertex_data, GL_STATIC_DRAW);
-
+    model.VAO = VAO;    
+    
     game_state->render_handle->models.push_back(model);
-
-    return model;
+    
+    return game_state->render_handle->models.data();
 }
 
-int32_t add_model_instance (Model& model, MeshInstance mesh_instance) {
-    model.instances.push_back(mesh_instance);
-    return model.instances.size();
+void setup_mesh(Model* model, Mesh* mesh) {
+    uint32_t indx;
+    
+    model->meshes.push_back(*mesh);
+    indx = model->meshes.size() - 1;
+    
+    Mesh* mp = &model->meshes[indx];
+    
+    glGenBuffers(1, &mp->VBO);
+    glGenBuffers(1, &mp->EBO);
+    
+    glNamedBufferData(mp->VBO, mp->vertex_count * sizeof(Vertex), mp->vertex_data, GL_STATIC_DRAW);
+    glNamedBufferData(mp->EBO, mp->element_count * sizeof(uint32_t), mp->element_data, GL_STATIC_DRAW);    
+    
+    return;
 }
+    // glGenBuffers(1, &model.VBO);
+    // glGenBuffers(1, &model.EBO);
+
+    // int vbo_size = model.mesh_data->vertex_count * sizeof(Vertex);
+    // glNamedBufferData(model.VBO, vbo_size, model.mesh_data->vertex_data, GL_STATIC_DRAW);
+
+// int32_t add_model_instance (Model& model, MeshInstance mesh_instance) {
+//     model.instances.push_back(mesh_instance);
+//     return model.instances.size();
+// }

@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 #include "vector"
+#include "string"
 #include "game_state.h"
 #include "GLFW/glfw3.h"
 
@@ -16,18 +17,10 @@ struct Vertex {
     glm::vec2 tex_coord = {.0f, .0f};
 };
 
-struct Scene {
-    Mesh* mesh_data = nullptr;
-    int32_t num_meshes = 0;
-
-	std::vector<MeshNode> nodes;
-
-}
-
 struct MeshNode {
-    std::vector<MeshNode>	children;	// Tree
-    std::vector<int>		meshes;  	// Index to the root nodes meshes.				
-}
+    std::vector<MeshNode>	children;	        // Tree
+    std::vector<int>		indices;  	    // Index to the root nodes meshes.				
+};
 
 struct Mesh {
     Vertex* vertex_data  = nullptr;
@@ -35,6 +28,9 @@ struct Mesh {
 
     uint32_t*   element_data  = nullptr;
     int32_t     element_count = 0;
+    
+    uint32_t VBO;
+    uint32_t EBO;
 };
 
 struct MeshInstance { 	
@@ -46,17 +42,22 @@ struct MeshInstance {
 };
 
 struct Model {
-    Mesh*   mesh_data;
-    int32_t mesh_count = 0;
-    std::vector<MeshInstance> instances;
+    std::vector<Mesh> meshes;
+	std::vector<MeshNode> nodes;
+	std::vector<MeshInstance> instances;
+	
+    uint32_t* VAO;
+    
+    std::string file_path = "";
 };
+
 
 struct RenderHandle {
     unsigned int shader_program;
     // At compile time, load all mesh data into here.
     std::vector<Model> models;
 
-    unsigned int default_vao = 0;
+    unsigned int default_vao;
 };
 
 // Render Pipeline
@@ -64,9 +65,13 @@ void init_render ();
 void create_window ();
 void create_renderer ();
 void create_shader_program ();
-void create_vertex_attributes () ;
+void create_vertex_attributes ();
 void render ();
 
+int get_vert_data_size (Mesh* mesh) ;
+
 // Model Utility
-Model create_model (Mesh* mesh, uint32_t* VAO);
-int32_t add_model_instance (Model& model, MeshInstance mesh_instance);
+Model* create_model (uint32_t* VAO);
+void setup_mesh(Model* model, Mesh* mesh);
+
+// int32_t add_model_instance (Model& model, MeshInstance mesh_instance);

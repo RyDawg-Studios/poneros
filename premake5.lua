@@ -13,7 +13,7 @@ project "Poneros"
    includedirs{"include/**", "include"} 
 
    files { "**.h", "**.cpp", "**.c" }
-   links {"glfw3", "user32", "vcruntime", "shell32", "gdi32"}
+   links {"glfw3", "user32", "vcruntime", "shell32", "gdi32", "assimp-vc143-mt"}
    
 
    filter "configurations:Debug"
