@@ -30,8 +30,9 @@ int main () {
 
 
     while (!glfwWindowShouldClose(game_state->window)) {
-	glfwPollEvents();
+        glfwPollEvents();
         render();
+
     }
 
     glfwDestroyWindow(game_state->window);

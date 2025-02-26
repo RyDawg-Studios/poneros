@@ -4,15 +4,46 @@
 #include "file_utils.h"
 #include <cstdio>
 
+GLenum glCheckError_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+    }
+    return errorCode;
+}
+#define glCheckError() glCheckError_(__FILE__, __LINE__) 
+
 Vertex TEST_VERTS[] = {
-    {{-.5, -.5, .0}},
+    {{ .5,  .5, .0}},
     {{ .5, -.5, .0}},
-    {{ .0,  .5, .0}},
+    {{-.5, -.5, .0}},
+    {{-.5,  .5, .0}},
 };
+
+uint32_t TEST_INDICES[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};  
 
 Mesh TEST_MESH = {
     .vertex_data    = TEST_VERTS,
-    .vertex_count   = 3
+    .vertex_count   = 4,
+    
+    .element_data   = TEST_INDICES,
+    .element_count  = 6,
 };
 
 void init_render () {
@@ -20,6 +51,7 @@ void init_render () {
     create_window();
     create_shader_program();
     create_vertex_attributes();
+
     
     uint32_t* default_vao = &game_state->render_handle->default_vao;
     Model* test_model = create_model(default_vao);
@@ -58,6 +90,7 @@ void create_renderer () {
 }
 
 void create_shader_program () {
+
     const GLchar* vertex_shader_data =
         read_from_file("C:/Users/RyDaw/Documents/poneros/src/shaders/shader.vert");
 
@@ -105,11 +138,11 @@ void render () {
         for (MeshNode &node : model.nodes) {
             for (int &id : node.indices) {
                 glBindBuffer(GL_ARRAY_BUFFER, model.meshes[id].VBO);
-                            
-                glDrawArrays(GL_TRIANGLES, 0, 3);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.meshes[id].EBO);
+
+                glDrawElements(GL_TRIANGLES, model.meshes[id].element_count, GL_UNSIGNED_INT, 0);
             }
         }
-
     }
     glfwSwapBuffers(game_state->window);
 }
@@ -138,9 +171,13 @@ void setup_mesh(Model* model, Mesh* mesh) {
     
     glGenBuffers(1, &mp->VBO);
     glGenBuffers(1, &mp->EBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mp->VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mp->EBO);
     
     glNamedBufferData(mp->VBO, mp->vertex_count * sizeof(Vertex), mp->vertex_data, GL_STATIC_DRAW);
-    glNamedBufferData(mp->EBO, mp->element_count * sizeof(uint32_t), mp->element_data, GL_STATIC_DRAW);    
+    glNamedBufferData(mp->EBO, mp->element_count * sizeof(uint32_t), mp->element_data, GL_STATIC_DRAW); 
+    glCheckError();   
     
     return;
 }
